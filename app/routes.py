@@ -12,7 +12,7 @@ from sqlalchemy.sql import func
 
 @app.route('/')
 def index():
-    # add_products()
+  
     
     return render_template('index.html')
 
@@ -122,6 +122,8 @@ def add_products():
 def products1(product_cat):
     
     produc = Products.query.filter_by(category = product_cat).all()
+    if produc ==[]:
+          add_products()
     
     
     return render_template('products.html', product=produc )
@@ -136,8 +138,9 @@ def add_to_cart(product_cat,product_id):
     produc = Products.query.filter_by(category = product_cat).all()
     
     for prod in produc:
+        user= current_user.id
         if prod.id == product_id:
-            prod=ShoppingCart(prod.name,prod.description,prod.price,prod.category,prod.image)
+            prod=ShoppingCart(prod.name,prod.description,prod.price,prod.category,prod.image,user)
             db.session.add(prod)
             db.session.commit()
             
@@ -152,7 +155,7 @@ def add_to_cart(product_cat,product_id):
 @app.route('/cart' )
 @login_required
 def cart():
-    produc = ShoppingCart.query.all()
+    produc= ShoppingCart.query.filter_by(user = current_user.id).all()
     total=ShoppingCart.gettotal()
       
     
@@ -164,7 +167,7 @@ def cart():
 @app.route('/cart/<int:product_id>' )
 @login_required
 def delete_from_cart(product_id):
-    produc = ShoppingCart.query.all()
+    produc= ShoppingCart.query.filter_by(user = current_user.id).all()
     total=ShoppingCart.gettotal()
     for prod in produc:
         if prod.id == product_id:
@@ -182,7 +185,7 @@ def delete_from_cart(product_id):
 @app.route('/quantity' )
 @login_required
 def quantity():
-    produc = ShoppingCart.query.all()
+    produc= ShoppingCart.query.filter_by(user = current_user.id).all()
     total=ShoppingCart.gettotal()
       
     
@@ -195,7 +198,7 @@ def quantity():
 @app.route('/purchased' )
 @login_required
 def purchased():
-    produc = ShoppingCart.query.all()
+    produc= ShoppingCart.query.filter_by(user = current_user.id).all()
     total=ShoppingCart.gettotal()
     if total!=0:
         return render_template('purchased.html', product=produc, total=total)
@@ -207,7 +210,7 @@ def purchased():
 @app.route('/done' )
 @login_required
 def done():
-    produc = ShoppingCart.query.all()
+    produc= ShoppingCart.query.filter_by(user = current_user.id).all()
     for prod in produc:
             db.session.delete(prod)
             db.session.commit()

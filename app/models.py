@@ -1,6 +1,6 @@
 from app import db, login
 from werkzeug.security import generate_password_hash
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from datetime import datetime
 
 
@@ -76,13 +76,15 @@ class ShoppingCart(db.Model):
     price = db.Column(db.Integer(), nullable=False)
     category = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     image= db.Column(db.String(30), nullable=False)
+    user = db.Column(db.Integer(), nullable=False)
 
-    def __init__(self,  name, description,price,category,image):
+    def __init__(self,  name, description,price,category,image,user):
         self.name = name
         self.description = description
         self.price = price
         self.category = category
         self.image = image
+        self.user=user
 
     def __repr__(self):
         return f'<Post | {self.name}>'    
@@ -90,7 +92,7 @@ class ShoppingCart(db.Model):
     
     @classmethod
     def gettotal(cls):
-        produc = ShoppingCart.query.all()
+        produc =ShoppingCart.query.filter_by(user = current_user.id).all()
         total=0
         for prod in produc:
             total+=prod.price 
